@@ -6,15 +6,15 @@ import urllib.request
 import zipfile
 import shutil
 
-def instalador_pack_win(pacotew):
-    subprocess.check_call([sys.executable, "-m", "pip", "install", pacotew])
+def instalador_pack_all(pacotea):
+    subprocess.check_call([sys.executable, "-m", "pip", "install", pacotea])
 
 
 def instalador_pack_lin(pacotel):
     subprocess.check_call(["sudo", "apt", "install", "-y", pacotel])
 
 
-def instalar_ffmpeg_windows():
+def instalar_ffmpeg():
     if not shutil.which("ffmpeg"):
         ffmpeg_url = "https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip"
 
@@ -22,14 +22,14 @@ def instalar_ffmpeg_windows():
         pasta_destino = os.path.join(os.getcwd(), "ffmpeg")
 
         if os.path.exists(os.path.join(pasta_destino, "bin", "ffmpeg.exe")):
-            print("FFmpeg já está instalado.")
+            print("FFmpeg is already installed✅​.")
             return
     
-        print("tentando baixar o FFmpeg...")
+        print("downloading​🌐​FFmpeg...")
 
         urllib.request.urlretrieve(ffmpeg_url, ffmpeg_zip)
 
-        print("Extraindo FFmpeg")
+        print("extracting​📂​FFmpeg")
 
         with zipfile.ZipFile(ffmpeg_zip, "r") as zip_ref:
             zip_ref.extractall(pasta_destino)
@@ -42,11 +42,11 @@ def instalar_ffmpeg_windows():
                 break
 
         if past_bin is None:
-            print("Não foi possível encontrar o ffmpeg.exe.")
+            print("Could not find ffmpeg.exe.")
             return
 
         os.environ["PATH"] += os.pathsep + past_bin
-        print("FFmpeg instalado com sucesso!!")
+        print("FFmpeg successfully installed✅​!!")
 
         os.remove(ffmpeg_zip)
     else:
@@ -57,29 +57,33 @@ def instalar_spotdl():
 
     if sist == "Linux":
         instalador_pack_lin("ffmpeg")
-        instalador_pack_win("spotdl")
+        instalador_pack_all("spotdl")
 
     elif sist == "Windows":
-        instalar_ffmpeg_windows()
-        instalador_pack_win("spotdl")
+        instalar_ffmpeg()
+        instalador_pack_all("spotdl")
 
     else:
-        print("seu sistema nao é surportado!!")
+        print("your system is not supported​🔧​!!")
 
 sist = platform.system()
 if sist == "Windows":
-    print("windows detectado.")
+    print("windows detected🪟​")
     instalar_spotdl
 
 elif sist == "Linux":
-    print("linux detectado")
+    print("linux detected🐧​")
     instalar_spotdl
 
+def clear():
+    os.system('cls' if os.name == 'nt' else 'clear')
+    
 def baixar_play():
-    print("cole seu link aqui!!")
+
+    clear()
+
+    print("paste your link here💽​!!")
     link = input(": ").strip()
-
-
 
     validaçao = "/playlist/" and "/open.spotify.com" in link
 
@@ -90,17 +94,20 @@ def baixar_play():
 
         comando = f'spotdl download "{link}" --output "{past_m}/%(artist)s - %(title)s.%(ext)s"'
 
-        print(f"\n iniciado o download da playlist {past_m}...\n")
+        print(f"\n playlist download started {past_m}🗂️​...\n")
 
         try:
             subprocess.run(comando, shell=True, check=True)
-            print("\n Download concluído")
+            print("\n download done successfully🟢​")
         except subprocess.CalledProcessError as e:
             print(f"\n Erro : {e}")
+    else:
+        print("your link is not valid❌​")
+        sys.exit
 
 if __name__ == "__main__":
-    print("Iniciando instalação do que precisa...")
+    print("installing all program dependencies⚙️​...")
 
     instalar_spotdl()
-    instalar_ffmpeg_windows()
+    instalar_ffmpeg()
     baixar_play()
